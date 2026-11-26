@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f3">
+  <title>DELTA CONCEPT AFRICA — Suivi de chantiers</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Accueil">
+        <img class="company-logo" src="delta-concept-africa.svg" alt="Delta Concept Africa">
+      </a>
+      <div class="side-heading"><span>VOS PROJETS</span><button class="icon-button" id="new-project-shortcut" aria-label="Ajouter un projet">+</button></div>
+      <nav id="project-nav" class="project-nav" aria-label="Projets"></nav>
+      <div class="sidebar-footer"><span class="online-dot"></span> Données enregistrées sur cet appareil</div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>CHANTIERS</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Vue d’ensemble</strong></div>
+        <div class="topbar-right"><span class="today-label" id="today-label"></span><span class="avatar">B</span></div>
+      </header>
+      <section id="overview-view" class="view"></section>
+      <section id="project-view" class="view hidden"></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="project-modal" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">NOUVEAU CHANTIER</p><h2 id="project-modal-title">Créer un projet</h2></div><button class="icon-button close-modal" aria-label="Fermer">×</button></div>
+      <form id="project-form">
+        <label>Nom du projet<input name="name" required placeholder="Ex. Résidence Les Oliviers"></label>
+        <div class="form-grid">
+          <label>Client<input name="client" placeholder="Nom du client"></label>
+          <label>Localisation<input name="location" placeholder="Ville, adresse"></label>
+          <label>Date de début<input name="startDate" type="date"></label>
+          <label>Statut<select name="status"><option>En cours</option><option>À venir</option><option>Terminé</option></select></label>
+        </div>
+        <label>Description<textarea name="description" rows="3" placeholder="Quelques détails sur le chantier…"></textarea></label>
+        <div class="modal-actions"><button type="button" class="button button-quiet close-modal">Annuler</button><button type="submit" class="button button-primary">Créer le projet <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="report-modal" role="presentation">
+    <section class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">JOURNAL DE CHANTIER</p><h2 id="report-modal-title">Nouveau point du jour</h2></div><button class="icon-button close-modal" aria-label="Fermer">×</button></div>
+      <form id="report-form">
+        <div class="form-grid report-meta">
+          <label>Date du rapport<input name="date" type="date" required></label>
+          <label>Effectif total<input name="crew" type="number" min="0" placeholder="Ex. 18"></label>
+          <label>Dont sous-traitants<input name="subcontractors" type="number" min="0" placeholder="Ex. 5"></label>
+          <label>Météo / arrêts<input name="weather" placeholder="Ex. Ensoleillé, aucun arrêt"></label>
+        </div>
+        <label>Travaux réalisés<textarea name="work" rows="3" placeholder="Décrivez les travaux effectués aujourd’hui…" required></textarea></label>
+        <div class="label-with-action"><label>Avancement par lot / niveau</label><button type="button" class="text-button" id="add-progress">+ Ajouter une ligne</button></div>
+        <div id="progress-rows" class="progress-rows"></div>
+        <div class="form-grid">
+          <label>Blocages<textarea name="blockers" rows="2" placeholder="RAS ou détails…"></textarea></label>
+          <label>Besoins<textarea name="needs" rows="2" placeholder="Matériel, ressources…"></textarea></label>
+          <label>Sécurité<input name="safety" placeholder="RAS / observation"></label>
+          <label>Programme de demain<textarea name="tomorrow" rows="2" placeholder="Travaux prévus…"></textarea></label>
+        </div>
+        <div class="photo-upload-block">
+          <p class="photo-upload-title">Photos de l’avancement</p>
+          <label class="photo-picker">+ Ajouter des photos<input id="report-photo-input" type="file" accept="image/*" multiple></label>
+          <div id="report-photo-drafts" class="photo-grid"></div>
+        </div>
+        <div class="modal-actions"><button type="button" class="button button-quiet close-modal">Annuler</button><button type="submit" class="button button-primary">Enregistrer le rapport <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="stock-modal" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="stock-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">STOCK DU CHANTIER</p><h2 id="stock-modal-title">Ajouter un article</h2></div><button class="icon-button close-modal" aria-label="Fermer">×</button></div>
+      <form id="stock-form">
+        <label>Matériel / article<input name="name" required placeholder="Ex. Ciment CPJ 45"></label>
+        <label>Catégorie<select name="category"><option>Matériaux</option><option>Outillage</option><option>Électricité</option><option>Plomberie</option><option>Sécurité</option><option>Autre</option></select></label>
+        <div class="form-grid">
+          <label id="stock-quantity-field">Stock initial<input name="quantity" type="number" min="0" step="any" required placeholder="Ex. 120"></label>
+          <label>Unité<input name="unit" required placeholder="sacs, pièces, kg, m³…"></label>
+        </div>
+        <div class="modal-actions"><button type="button" class="button button-quiet close-modal">Annuler</button><button type="submit" class="button button-primary">Enregistrer le stock <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="movement-modal" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="movement-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">MOUVEMENT DE STOCK</p><h2 id="movement-modal-title">Enregistrer une entrée</h2></div><button class="icon-button close-modal" aria-label="Fermer">×</button></div>
+      <form id="movement-form">
+        <p id="movement-item-name" class="movement-item-name"></p>
+        <div class="form-grid">
+          <label>Date<input name="date" type="date" required></label>
+          <label>Quantité<input name="quantity" type="number" min="0.01" step="any" required placeholder="Ex. 20"></label>
+        </div>
+        <label id="movement-note-label">Détail<input name="note" placeholder="Fournisseur, bon de livraison…"></label>
+        <div id="movement-error" class="form-error hidden" role="alert"></div>
+        <div class="modal-actions"><button type="button" class="button button-quiet close-modal">Annuler</button><button type="submit" class="button button-primary">Enregistrer <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="order-modal" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">COMMANDE DU CHANTIER</p><h2 id="order-modal-title">Ajouter une commande</h2></div><button class="icon-button close-modal" aria-label="Fermer">×</button></div>
+      <form id="order-form">
+        <div class="form-grid">
+          <label>Date de commande<input name="date" type="date" required></label>
+          <label>Référence (optionnel)<input name="reference" placeholder="Ex. CMD-024"></label>
+        </div>
+        <label>Fournisseur<input name="supplier" required placeholder="Nom du fournisseur"></label>
+        <label>Matériel / article commandé<input name="item" required placeholder="Ex. Ciment CPJ 45"></label>
+        <div class="form-grid">
+          <label>Quantité<input name="quantity" type="number" min="0.01" step="any" required placeholder="Ex. 50"></label>
+          <label>Unité<input name="unit" required placeholder="sacs, pièces, kg…"></label>
+          <label>Livraison prévue<input name="expectedDate" type="date"></label>
+          <label>Statut<select name="status"><option value="pending">À commander</option><option value="ordered">Commandée</option><option value="partial">Partiellement reçue</option><option value="received">Reçue</option></select></label>
+        </div>
+        <label>Note<textarea name="note" rows="2" placeholder="Précisions sur la commande…"></textarea></label>
+        <div class="modal-actions"><button type="button" class="button button-quiet close-modal">Annuler</button><button type="submit" class="button button-primary">Enregistrer la commande <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+</body>
+</html>
